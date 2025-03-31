@@ -18,20 +18,20 @@ function Auth({ onLogin }) {
         : await login(email, password);
       
       if (!token) {
-        throw new Error(isRegistering ? 'Ошибка регистрации' : 'Неверный email или пароль');
+        throw new Error(isRegistering ? 'Registration error' : 'Invalid email or password');
       }
       
       onLogin(token);
       navigate('/dashboard');
     } catch (err) {
-      setError(err.response?.data?.message || err.message || 'Ошибка авторизации');
+      setError(err.response?.data?.message || err.message || 'Authentication error');
     }
   };
 
   return (
     <div className="auth-container">
       <div className="auth-form">
-        <h2>{isRegistering ? 'Регистрация' : 'Вход'}</h2>
+        <h2>{isRegistering ? 'Registration' : 'Login'}</h2>
         {error && <div className="error-message">{error}</div>}
         <form onSubmit={handleAuth}>
           <div className="form-group">
@@ -40,23 +40,23 @@ function Auth({ onLogin }) {
               type="email"
               value={email}
               onChange={e => setEmail(e.target.value)}
-              placeholder="Введите email"
+              placeholder="Enter email"
               required
             />
           </div>
           <div className="form-group">
-            <label>Пароль:</label>
+            <label>Password:</label>
             <input 
               type="password"
               value={password}
               onChange={e => setPassword(e.target.value)}
-              placeholder="Введите пароль"
+              placeholder="Enter password"
               required
               minLength={6}
             />
           </div>
           <button type="submit" className="auth-button">
-            {isRegistering ? 'Зарегистрироваться' : 'Войти'}
+            {isRegistering ? 'Register' : 'Login'}
           </button>
         </form>
         <button 
@@ -66,7 +66,7 @@ function Auth({ onLogin }) {
             setError('');
           }}
         >
-          {isRegistering ? 'Уже есть аккаунт?' : 'Создать аккаунт'}
+          {isRegistering ? 'Already have an account?' : 'Create account'}
         </button>
       </div>
     </div>

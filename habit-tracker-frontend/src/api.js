@@ -2,7 +2,7 @@ import axios from 'axios';
 
 const API_URL = 'http://localhost:5000/api';
 
-// Создаем инстанс axios с базовым URL
+// Create axios instance with base URL
 const api = axios.create({
   baseURL: API_URL,
   headers: {
@@ -10,7 +10,7 @@ const api = axios.create({
   }
 });
 
-// Перехватчик для обработки ошибок
+// Interceptor for error handling
 api.interceptors.response.use(
   response => response,
   error => {

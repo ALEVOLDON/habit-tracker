@@ -23,7 +23,7 @@ function Dashboard({ token, onLogout }) {
 
   const handleAdd = async () => {
     if (!title.trim()) {
-      setError('Введите название привычки');
+      setError('Please enter a habit name');
       return;
     }
     try {
@@ -32,7 +32,7 @@ function Dashboard({ token, onLogout }) {
       setError('');
       loadHabits();
     } catch (err) {
-      setError('Ошибка при добавлении привычки');
+      setError('Error adding habit');
     }
   };
 
@@ -41,7 +41,7 @@ function Dashboard({ token, onLogout }) {
       await checkHabit(token, id);
       loadHabits();
     } catch (err) {
-      setError('Ошибка при отметке привычки');
+      setError('Error checking habit');
     }
   };
 
@@ -56,33 +56,33 @@ function Dashboard({ token, onLogout }) {
   return (
     <div className="app-container">
       <header className="app-header">
-        <h2>Мои привычки</h2>
+        <h2>My Habits</h2>
         <button className="logout-button" onClick={() => {
           onLogout();
           navigate('/login');
         }}>
-          Выйти
+          Logout
         </button>
       </header>
 
       <div className="add-habit-form">
         {error && <div className="error-message">{error}</div>}
         <div className="form-group">
-          <label>Название:</label>
+          <label>Name:</label>
           <input
             value={title}
             onChange={e => setTitle(e.target.value)}
-            placeholder="Новая привычка"
+            placeholder="New habit"
           />
         </div>
         <div className="form-group">
-          <label>Частота:</label>
+          <label>Frequency:</label>
           <select value={frequency} onChange={e => setFrequency(e.target.value)}>
-            <option value="daily">Ежедневно</option>
-            <option value="weekly">Еженедельно</option>
+            <option value="daily">Daily</option>
+            <option value="weekly">Weekly</option>
           </select>
         </div>
-        <button onClick={handleAdd}>Добавить</button>
+        <button onClick={handleAdd}>Add</button>
       </div>
 
       <div className="habits-list">
@@ -91,11 +91,11 @@ function Dashboard({ token, onLogout }) {
             <div className="habit-header">
               <h3>{habit.title}</h3>
               <span className="habit-frequency">
-                {habit.frequency === 'daily' ? 'Ежедневно' : 'Еженедельно'}
+                {habit.frequency === 'daily' ? 'Daily' : 'Weekly'}
               </span>
             </div>
             <div className="habit-progress">
-              <span>Прогресс: {habit.progress?.length || 0} отметок</span>
+              <span>Progress: {habit.progress?.length || 0} checks</span>
               <button 
                 className="check-button"
                 onClick={() => handleCheck(habit._id)}

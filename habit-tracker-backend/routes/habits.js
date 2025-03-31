@@ -4,13 +4,13 @@ const auth = require('../middleware/authMiddleware');
 
 const router = express.Router();
 
-// Получить все привычки пользователя
+// Get all user habits
 router.get('/', auth, async (req, res) => {
   const habits = await Habit.find({ userId: req.user.userId });
   res.json(habits);
 });
 
-// Добавить привычку
+// Add new habit
 router.post('/', auth, async (req, res) => {
   const { title, frequency } = req.body;
   const habit = new Habit({
@@ -24,12 +24,12 @@ router.post('/', auth, async (req, res) => {
   res.status(201).json(habit);
 });
 
-// Отметить выполнение
+// Mark habit as completed
 router.patch('/:id/check', auth, async (req, res) => {
   const date = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
   const habit = await Habit.findOne({ _id: req.params.id, userId: req.user.userId });
 
-  if (!habit) return res.status(404).json({ message: 'Привычка не найдена' });
+  if (!habit) return res.status(404).json({ message: 'Habit not found' });
 
   if (!habit.progress.includes(date)) habit.progress.push(date);
   await habit.save();
@@ -37,10 +37,10 @@ router.patch('/:id/check', auth, async (req, res) => {
   res.json(habit);
 });
 
-// Удалить привычку
+// Delete habit
 router.delete('/:id', auth, async (req, res) => {
   await Habit.deleteOne({ _id: req.params.id, userId: req.user.userId });
-  res.json({ message: 'Удалено' });
+  res.json({ message: 'Deleted' });
 });
 
 module.exports = router;

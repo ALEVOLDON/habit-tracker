@@ -16,11 +16,69 @@ const validateHabit = [
     .withMessage('Frequency must be either daily or weekly')
 ];
 
-// Get all user habits
+// Get all user habits with filtering and sorting
 router.get('/', auth, async (req, res) => {
   try {
-    const habits = await Habit.find({ userId: req.user.userId });
-    res.json(habits);
+    const {
+      categoryId,
+      frequency,
+      search,
+      sortBy = 'createdAt',
+      sortOrder = 'desc',
+      page = 1,
+      limit = 10
+    } = req.query;
+
+    // Создаем базовый запрос
+    const query = { userId: req.user.userId };
+
+    // Добавляем фильтры
+    if (categoryId) {
+      query.categoryId = categoryId;
+    }
+    if (frequency) {
+      query.frequency = frequency;
+    }
+    if (search) {
+      query.title = { $regex: search, $options: 'i' };
+    }
+
+    // Определяем сортировку
+    const sortOptions = {};
+    sortOptions[sortBy] = sortOrder === 'desc' ? -1 : 1;
+
+    // Выполняем запрос с пагинацией
+    const skip = (page - 1) * limit;
+    const habits = await Habit.find(query)
+      .sort(sortOptions)
+      .skip(skip)
+      .limit(parseInt(limit))
+      .populate('categoryId', 'name color');
+
+    // Получаем общее количество для пагинации
+    const total = await Habit.countDocuments(query);
+
+    // Получаем статистику для каждой привычки
+    const today = new Date().toISOString().split('T')[0];
+    const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+    
+    const habitsWithStats = habits.map(habit => {
+      const stats = habit.getStats(thirtyDaysAgo, today);
+      return {
+        ...habit.toObject(),
+        stats
+      };
+    });
+
+    res.json({
+      habits: habitsWithStats,
+      pagination: {
+        total,
+        page: parseInt(page),
+        limit: parseInt(limit),
+        totalPages: Math.ceil(total / limit)
+      }
+    });
   } catch (err) {
     console.error('Error fetching habits:', err);
     res.status(500).json({ message: 'Server error' });

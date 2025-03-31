@@ -40,6 +40,9 @@ app.use('/api/auth', authRoutes);
 const habitRoutes = require('./routes/habits');
 app.use('/api/habits', habitRoutes);
 
+const categoryRoutes = require('./routes/categories');
+app.use('/api/categories', categoryRoutes);
+
 app.get('/', (req, res) => {
   res.send('API is working!');
 });

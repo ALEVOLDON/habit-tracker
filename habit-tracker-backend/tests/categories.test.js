@@ -1,10 +1,22 @@
 const request = require('supertest');
 const mongoose = require('mongoose');
+const { MongoMemoryServer } = require('mongodb-memory-server');
 const app = require('../app');
 const User = require('../models/User');
 const Category = require('../models/Category');
 const Habit = require('../models/Habit');
-const jwt = require('jsonwebtoken');
+
+let mongoServer;
+
+beforeAll(async () => {
+  mongoServer = await MongoMemoryServer.create();
+  await mongoose.connect(mongoServer.getUri());
+});
+
+afterAll(async () => {
+  await mongoose.disconnect();
+  await mongoServer.stop();
+});
 
 describe('Category Routes', () => {
   let token;
@@ -16,12 +28,15 @@ describe('Category Routes', () => {
     await Habit.deleteMany({});
 
     // Создаем тестового пользователя
-    const user = await User.create({
-      email: 'test@example.com',
-      passwordHash: 'hashedPassword'
-    });
-    userId = user._id;
-    token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET);
+    const response = await request(app)
+      .post('/api/auth/register')
+      .send({
+        email: 'test@example.com',
+        password: 'password123'
+      });
+
+    token = response.body.token;
+    userId = response.body.userId;
   });
 
   describe('GET /api/categories', () => {
@@ -65,7 +80,7 @@ describe('Category Routes', () => {
       expect(response.status).toBe(201);
       expect(response.body.name).toBe('Health');
       expect(response.body.color).toBe('#FF0000');
-      expect(response.body.userId).toBe(userId.toString());
+      expect(response.body.userId).toBe(userId);
     });
 
     it('should use default color if not provided', async () => {
@@ -202,7 +217,8 @@ describe('Category Routes', () => {
       // Создаем привычку с этой категорией
       const habit = await Habit.create({
         userId,
-        title: 'Exercise',
+        name: 'Exercise',
+        description: 'Daily workout',
         frequency: 'daily',
         categoryId
       });

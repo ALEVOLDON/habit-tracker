@@ -20,8 +20,11 @@ describe('Habits Statistics API', () => {
 
   describe('GET /api/habits/stats', () => {
     it('should return empty stats when no habits exist', async () => {
+      const today = new Date().toISOString().split('T')[0];
+      const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+
       const response = await request(app)
-        .get('/api/habits/stats')
+        .get(`/api/habits/stats?startDate=${yesterday}&endDate=${today}`)
         .set('Authorization', `Bearer ${token}`);
 
       expect(response.status).toBe(200);
@@ -44,7 +47,7 @@ describe('Habits Statistics API', () => {
       });
 
       const response = await request(app)
-        .get('/api/habits/stats')
+        .get(`/api/habits/stats?startDate=${yesterday}&endDate=${today}`)
         .set('Authorization', `Bearer ${token}`);
 
       expect(response.status).toBe(200);
@@ -66,7 +69,7 @@ describe('Habits Statistics API', () => {
       });
 
       const response = await request(app)
-        .get('/api/habits/stats')
+        .get(`/api/habits/stats?startDate=${lastWeek}&endDate=${today}`)
         .set('Authorization', `Bearer ${token}`);
 
       expect(response.status).toBe(200);
@@ -96,7 +99,7 @@ describe('Habits Statistics API', () => {
       ]);
 
       const response = await request(app)
-        .get('/api/habits/stats')
+        .get(`/api/habits/stats?startDate=${yesterday}&endDate=${today}`)
         .set('Authorization', `Bearer ${token}`);
 
       expect(response.status).toBe(200);

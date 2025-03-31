@@ -1,5 +1,7 @@
 const express = require('express');
+const mongoose = require('mongoose');
 const Habit = require('../models/Habit');
+const Category = require('../models/Category');
 const auth = require('../middleware/authMiddleware');
 const { body, validationResult } = require('express-validator');
 
@@ -13,7 +15,17 @@ const validateHabit = [
     .withMessage('Title must be between 1 and 100 characters'),
   body('frequency')
     .isIn(['daily', 'weekly'])
-    .withMessage('Frequency must be either daily or weekly')
+    .withMessage('Frequency must be either daily or weekly'),
+  body('categoryId')
+    .optional({ nullable: true })
+    .custom(async (value, { req }) => {
+      if (!value) return true;
+      const category = await Category.findOne({ _id: value, userId: req.user.userId });
+      if (!category) {
+        throw new Error('Category not found');
+      }
+      return true;
+    })
 ];
 
 // Get all user habits with filtering and sorting
@@ -33,7 +45,9 @@ router.get('/', auth, async (req, res) => {
     const query = { userId: req.user.userId };
 
     // Добавляем фильтры
-    if (categoryId) {
+    if (categoryId === 'null') {
+      query.categoryId = null;
+    } else if (categoryId) {
       query.categoryId = categoryId;
     }
     if (frequency) {
@@ -89,39 +103,61 @@ router.get('/', auth, async (req, res) => {
 router.get('/stats', auth, async (req, res) => {
   try {
     const { startDate, endDate } = req.query;
-    
-    // Если даты не указаны, используем последние 30 дней
-    const end = endDate || new Date().toISOString().split('T')[0];
-    const start = startDate || new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+    const start = startDate ? new Date(startDate) : new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+    const end = endDate ? new Date(endDate) : new Date();
 
-    const habits = await Habit.find({ userId: req.user.userId });
-    
-    const stats = habits.map(habit => ({
-      habitId: habit._id,
-      title: habit.title,
-      frequency: habit.frequency,
-      stats: habit.getStats(start, end)
-    }));
+    const habits = await Habit.find({ userId: req.user.userId })
+      .populate('categoryId', 'name color');
 
-    // Общая статистика
+    if (habits.length === 0) {
+      return res.json({
+        habits: [],
+        total: {
+          totalHabits: 0,
+          averageCompletion: 0,
+          bestStreak: 0,
+          totalCompleted: 0,
+          totalPossible: 0
+        },
+        period: {
+          start: start.toISOString().split('T')[0],
+          end: end.toISOString().split('T')[0]
+        }
+      });
+    }
+
+    const habitsWithStats = habits.map(habit => {
+      const stats = habit.getStats(start.toISOString().split('T')[0], end.toISOString().split('T')[0]);
+      return {
+        _id: habit._id,
+        title: habit.title,
+        frequency: habit.frequency,
+        categoryId: habit.categoryId,
+        stats
+      };
+    });
+
+    // Считаем общую статистику
     const totalStats = {
       totalHabits: habits.length,
       averageCompletion: Math.round(
-        stats.reduce((acc, curr) => acc + curr.stats.percentage, 0) / habits.length
+        habitsWithStats.reduce((sum, h) => sum + h.stats.percentage, 0) / habits.length
       ),
-      bestStreak: Math.max(...stats.map(s => s.stats.streak)),
-      totalCompleted: stats.reduce((acc, curr) => acc + curr.stats.completed, 0),
-      totalPossible: stats.reduce((acc, curr) => acc + curr.stats.total, 0)
+      bestStreak: Math.max(0, ...habitsWithStats.map(h => h.stats.streak)),
+      totalCompleted: habitsWithStats.reduce((sum, h) => sum + h.stats.completed, 0),
+      totalPossible: habitsWithStats.reduce((sum, h) => sum + h.stats.total, 0)
     };
 
     res.json({
-      habits: stats,
+      habits: habitsWithStats,
       total: totalStats,
-      period: { start, end }
+      period: {
+        start: start.toISOString().split('T')[0],
+        end: end.toISOString().split('T')[0]
+      }
     });
-  } catch (err) {
-    console.error('Error fetching statistics:', err);
-    res.status(500).json({ message: 'Server error' });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
   }
 });
 
@@ -133,11 +169,12 @@ router.post('/', auth, validateHabit, async (req, res) => {
   }
 
   try {
-    const { title, frequency } = req.body;
+    const { title, frequency, categoryId } = req.body;
     const habit = new Habit({
       userId: req.user.userId,
       title,
       frequency,
+      categoryId: categoryId || null,
       progress: []
     });
 
@@ -145,6 +182,31 @@ router.post('/', auth, validateHabit, async (req, res) => {
     res.status(201).json(habit);
   } catch (err) {
     console.error('Error creating habit:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// Update habit
+router.patch('/:id', auth, async (req, res) => {
+  try {
+    const updates = {};
+    if (req.body.title) updates.title = req.body.title;
+    if (req.body.frequency) updates.frequency = req.body.frequency;
+    if ('categoryId' in req.body) updates.categoryId = req.body.categoryId || null;
+
+    const habit = await Habit.findOneAndUpdate(
+      { _id: req.params.id, userId: req.user.userId },
+      updates,
+      { new: true }
+    );
+
+    if (!habit) {
+      return res.status(404).json({ message: 'Habit not found' });
+    }
+
+    res.json(habit);
+  } catch (err) {
+    console.error('Error updating habit:', err);
     res.status(500).json({ message: 'Server error' });
   }
 });
@@ -168,6 +230,50 @@ router.patch('/:id/check', auth, async (req, res) => {
   } catch (err) {
     console.error('Error updating habit:', err);
     res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// Добавить прогресс к привычке
+router.post('/:id/progress', auth, async (req, res) => {
+  try {
+    const habit = await Habit.findOne({ _id: req.params.id, userId: req.user.userId });
+    if (!habit) {
+      return res.status(404).json({ message: 'Habit not found' });
+    }
+
+    const { date } = req.body;
+    if (!date) {
+      return res.status(400).json({ message: 'Date is required' });
+    }
+
+    if (!habit.progress.includes(date)) {
+      habit.progress.push(date);
+      await habit.save();
+    }
+
+    res.json(habit);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Удалить прогресс из привычки
+router.delete('/:id/progress/:date', auth, async (req, res) => {
+  try {
+    const habit = await Habit.findOne({ _id: req.params.id, userId: req.user.userId });
+    if (!habit) {
+      return res.status(404).json({ message: 'Habit not found' });
+    }
+
+    const dateIndex = habit.progress.indexOf(req.params.date);
+    if (dateIndex > -1) {
+      habit.progress.splice(dateIndex, 1);
+      await habit.save();
+    }
+
+    res.json(habit);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
   }
 });
 

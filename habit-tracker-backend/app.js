@@ -5,6 +5,10 @@ const dotenv = require('dotenv');
 const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
+const authRoutes = require('./routes/auth');
+const habitRoutes = require('./routes/habits');
+const categoryRoutes = require('./routes/categories');
+const authenticateToken = require('./middleware/auth');
 
 dotenv.config();
 
@@ -34,14 +38,10 @@ app.use(limiter);
 
 const PORT = process.env.PORT || 5000;
 
-const authRoutes = require('./routes/auth');
+// Роуты
 app.use('/api/auth', authRoutes);
-
-const habitRoutes = require('./routes/habits');
-app.use('/api/habits', habitRoutes);
-
-const categoryRoutes = require('./routes/categories');
-app.use('/api/categories', categoryRoutes);
+app.use('/api/habits', authenticateToken, habitRoutes);
+app.use('/api/categories', authenticateToken, categoryRoutes);
 
 app.get('/', (req, res) => {
   res.send('API is working!');
@@ -56,14 +56,20 @@ app.use((err, req, res, next) => {
   });
 });
 
-mongoose.connect(process.env.MONGO_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-}).then(() => {
-  console.log('MongoDB connected');
-  app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
+// Подключение к базе данных
+if (process.env.NODE_ENV !== 'test') {
+  mongoose.connect(process.env.MONGO_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  }).then(() => {
+    console.log('MongoDB connected');
+    app.listen(PORT, () => {
+      console.log(`Server running on port ${PORT}`);
+    });
+  }).catch((err) => {
+    console.error('Mongo error:', err);
+    process.exit(1);
   });
-}).catch((err) => {
-  console.error('Mongo error:', err);
-});
+}
+
+module.exports = app;

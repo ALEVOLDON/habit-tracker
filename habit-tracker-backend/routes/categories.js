@@ -1,5 +1,6 @@
 const express = require('express');
 const Category = require('../models/Category');
+const Habit = require('../models/Habit');
 const auth = require('../middleware/authMiddleware');
 const { body, validationResult } = require('express-validator');
 
@@ -10,14 +11,14 @@ const validateCategory = [
   body('name')
     .trim()
     .isLength({ min: 1, max: 50 })
-    .withMessage('Category name must be between 1 and 50 characters'),
+    .withMessage('Name must be between 1 and 50 characters'),
   body('color')
     .optional()
-    .matches(/^#[0-9A-Fa-f]{6}$/)
+    .matches(/^#[0-9A-F]{6}$/i)
     .withMessage('Color must be a valid hex color code')
 ];
 
-// Get all user categories
+// Get all categories
 router.get('/', auth, async (req, res) => {
   try {
     const categories = await Category.find({ userId: req.user.userId });
@@ -36,19 +37,25 @@ router.post('/', auth, validateCategory, async (req, res) => {
   }
 
   try {
-    const { name, color } = req.body;
+    // Проверяем уникальность имени для пользователя
+    const existingCategory = await Category.findOne({
+      userId: req.user.userId,
+      name: req.body.name
+    });
+
+    if (existingCategory) {
+      return res.status(400).json({ message: 'Category with this name already exists' });
+    }
+
     const category = new Category({
       userId: req.user.userId,
-      name,
-      color: color || '#4CAF50'
+      name: req.body.name,
+      color: req.body.color || '#4CAF50' // Используем зеленый цвет по умолчанию
     });
 
     await category.save();
     res.status(201).json(category);
   } catch (err) {
-    if (err.code === 11000) {
-      return res.status(400).json({ message: 'Category with this name already exists' });
-    }
     console.error('Error creating category:', err);
     res.status(500).json({ message: 'Server error' });
   }
@@ -62,10 +69,22 @@ router.patch('/:id', auth, validateCategory, async (req, res) => {
   }
 
   try {
-    const { name, color } = req.body;
+    // Проверяем уникальность имени для пользователя
+    if (req.body.name) {
+      const existingCategory = await Category.findOne({
+        userId: req.user.userId,
+        name: req.body.name,
+        _id: { $ne: req.params.id }
+      });
+
+      if (existingCategory) {
+        return res.status(400).json({ message: 'Category with this name already exists' });
+      }
+    }
+
     const category = await Category.findOneAndUpdate(
       { _id: req.params.id, userId: req.user.userId },
-      { name, color },
+      { $set: req.body },
       { new: true }
     );
 
@@ -75,9 +94,6 @@ router.patch('/:id', auth, validateCategory, async (req, res) => {
 
     res.json(category);
   } catch (err) {
-    if (err.code === 11000) {
-      return res.status(400).json({ message: 'Category with this name already exists' });
-    }
     console.error('Error updating category:', err);
     res.status(500).json({ message: 'Server error' });
   }
@@ -86,11 +102,22 @@ router.patch('/:id', auth, validateCategory, async (req, res) => {
 // Delete category
 router.delete('/:id', auth, async (req, res) => {
   try {
-    const result = await Category.deleteOne({ _id: req.params.id, userId: req.user.userId });
-    if (result.deletedCount === 0) {
+    const category = await Category.findOneAndDelete({
+      _id: req.params.id,
+      userId: req.user.userId
+    });
+
+    if (!category) {
       return res.status(404).json({ message: 'Category not found' });
     }
-    res.json({ message: 'Deleted' });
+
+    // Удаляем ссылки на категорию из всех привычек
+    await Habit.updateMany(
+      { categoryId: req.params.id },
+      { $set: { categoryId: null } }
+    );
+
+    res.json({ message: 'Category deleted successfully' });
   } catch (err) {
     console.error('Error deleting category:', err);
     res.status(500).json({ message: 'Server error' });

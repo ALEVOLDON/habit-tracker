@@ -1,5 +1,6 @@
-const mongoose = require('mongoose');
 const { MongoMemoryServer } = require('mongodb-memory-server');
+const mongoose = require('mongoose');
+const { beforeAll, afterAll } = require('@jest/globals');
 
 let mongod;
 
@@ -18,8 +19,12 @@ afterEach(async () => {
   }
 });
 
-// Отключаемся от базы данных после всех тестов
+// Закрываем соединение с базой данных после всех тестов
 afterAll(async () => {
-  await mongoose.connection.close();
-  await mongod.stop();
+  if (mongoose.connection.readyState !== 0) {
+    await mongoose.connection.close();
+  }
+  if (mongod) {
+    await mongod.stop();
+  }
 }); 

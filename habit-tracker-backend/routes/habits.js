@@ -27,6 +27,46 @@ router.get('/', auth, async (req, res) => {
   }
 });
 
+// Get habits statistics
+router.get('/stats', auth, async (req, res) => {
+  try {
+    const { startDate, endDate } = req.query;
+    
+    // Если даты не указаны, используем последние 30 дней
+    const end = endDate || new Date().toISOString().split('T')[0];
+    const start = startDate || new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+
+    const habits = await Habit.find({ userId: req.user.userId });
+    
+    const stats = habits.map(habit => ({
+      habitId: habit._id,
+      title: habit.title,
+      frequency: habit.frequency,
+      stats: habit.getStats(start, end)
+    }));
+
+    // Общая статистика
+    const totalStats = {
+      totalHabits: habits.length,
+      averageCompletion: Math.round(
+        stats.reduce((acc, curr) => acc + curr.stats.percentage, 0) / habits.length
+      ),
+      bestStreak: Math.max(...stats.map(s => s.stats.streak)),
+      totalCompleted: stats.reduce((acc, curr) => acc + curr.stats.completed, 0),
+      totalPossible: stats.reduce((acc, curr) => acc + curr.stats.total, 0)
+    };
+
+    res.json({
+      habits: stats,
+      total: totalStats,
+      period: { start, end }
+    });
+  } catch (err) {
+    console.error('Error fetching statistics:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
 // Add new habit
 router.post('/', auth, validateHabit, async (req, res) => {
   const errors = validationResult(req);

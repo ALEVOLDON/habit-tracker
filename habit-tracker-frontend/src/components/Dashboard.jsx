@@ -32,6 +32,7 @@ function Dashboard({ token, onLogout }) {
       setError('');
       loadHabits();
     } catch (err) {
+      console.error('Error adding habit:', err);
       setError('Error adding habit');
     }
   };
@@ -41,6 +42,7 @@ function Dashboard({ token, onLogout }) {
       await checkHabit(token, id);
       loadHabits();
     } catch (err) {
+      console.error('Error checking habit:', err);
       setError('Error checking habit');
     }
   };

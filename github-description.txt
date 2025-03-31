@@ -1,3 +1,0 @@
-Habit tracking app built with Node.js, MongoDB, React and Vite. Track, mark, and manage your habits easily.
-
-Topics: habit-tracker, fullstack, nodejs, express, mongodb, react, vite, jwt, productivity

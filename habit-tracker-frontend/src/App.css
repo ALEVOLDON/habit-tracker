@@ -221,3 +221,11 @@ body {
   border-radius: 4px;
   margin-bottom: 1rem;
 }
+
+.success-message {
+  background-color: rgba(46, 204, 113, 0.1);
+  color: var(--success-color);
+  padding: 0.75rem;
+  border-radius: 4px;
+  margin-bottom: 1rem;
+}

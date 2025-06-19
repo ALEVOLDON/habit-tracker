@@ -1,22 +1,30 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getHabits, addHabit, checkHabit, updateHabit, deleteHabit, getCategories } from '../api';
+import { getHabits, addHabit, checkHabit, updateHabit, deleteHabit, getCategories, createCategory, updateCategory, deleteCategory } from '../api';
 
 function Dashboard({ token, onLogout }) {
+  // --- Состояния для привычек, фильтров и категорий ---
   const [habits, setHabits] = useState([]);
   const [title, setTitle] = useState('');
   const [frequency, setFrequency] = useState('daily');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-  const [editId, setEditId] = useState(null);
+  const [editId, setEditId] = useState(null); // id редактируемой привычки
   const [editTitle, setEditTitle] = useState('');
   const [editFrequency, setEditFrequency] = useState('daily');
   const [filterFrequency, setFilterFrequency] = useState('all');
   const [categories, setCategories] = useState([]);
   const [filterCategory, setFilterCategory] = useState('all');
+  // --- Состояния для создания/редактирования категорий ---
+  const [newCategoryName, setNewCategoryName] = useState('');
+  const [newCategoryColor, setNewCategoryColor] = useState('#4CAF50');
+  const [editCategoryId, setEditCategoryId] = useState(null);
+  const [editCategoryName, setEditCategoryName] = useState('');
+  const [editCategoryColor, setEditCategoryColor] = useState('#4CAF50');
   const navigate = useNavigate();
 
-  const loadHabits = async () => {
+  // --- Загрузка привычек пользователя ---
+  const loadHabits = useCallback(async () => {
     try {
       const data = await getHabits(token);
       setHabits(data);
@@ -26,17 +34,19 @@ function Dashboard({ token, onLogout }) {
         navigate('/login');
       }
     }
-  };
+  }, [token, onLogout, navigate]);
 
-  const loadCategories = async () => {
+  // --- Загрузка категорий пользователя ---
+  const loadCategories = useCallback(async () => {
     try {
       const data = await getCategories(token);
       setCategories(data);
     } catch {
       setCategories([]);
     }
-  };
+  }, [token]);
 
+  // --- Добавить новую привычку ---
   const handleAdd = async () => {
     if (!title.trim()) {
       setError('Пожалуйста, введите название привычки');
@@ -57,6 +67,7 @@ function Dashboard({ token, onLogout }) {
     }
   };
 
+  // --- Отметить привычку как выполненную ---
   const handleCheck = async (id) => {
     try {
       await checkHabit(token, id);
@@ -67,12 +78,14 @@ function Dashboard({ token, onLogout }) {
     }
   };
 
+  // --- Начать редактирование привычки ---
   const startEdit = (habit) => {
     setEditId(habit._id);
     setEditTitle(habit.title);
     setEditFrequency(habit.frequency);
   };
 
+  // --- Сохранить изменения привычки ---
   const handleEditSave = async (id) => {
     if (!editTitle.trim()) {
       setError('Пожалуйста, введите название привычки');
@@ -95,12 +108,14 @@ function Dashboard({ token, onLogout }) {
     }
   };
 
+  // --- Отмена редактирования привычки ---
   const handleEditCancel = () => {
     setEditId(null);
     setEditTitle('');
     setEditFrequency('daily');
   };
 
+  // --- Удалить привычку ---
   const handleDelete = async (id) => {
     if (!window.confirm('Удалить привычку?')) return;
     try {
@@ -112,6 +127,68 @@ function Dashboard({ token, onLogout }) {
     }
   };
 
+  // --- Создать новую категорию ---
+  const handleCreateCategory = async () => {
+    if (!newCategoryName.trim()) {
+      setError('Введите название категории');
+      return;
+    }
+    try {
+      await createCategory(token, newCategoryName, newCategoryColor);
+      setNewCategoryName('');
+      setNewCategoryColor('#4CAF50');
+      setSuccess('Категория создана!');
+      loadCategories();
+    } catch {
+      setError('Ошибка при создании категории');
+    }
+  };
+
+  // --- Начать редактирование категории ---
+  const startEditCategory = (cat) => {
+    setEditCategoryId(cat._id);
+    setEditCategoryName(cat.name);
+    setEditCategoryColor(cat.color || '#4CAF50');
+  };
+
+  // --- Сохранить изменения категории ---
+  const handleEditCategorySave = async (id) => {
+    if (!editCategoryName.trim()) {
+      setError('Введите название категории');
+      return;
+    }
+    try {
+      await updateCategory(token, id, { name: editCategoryName, color: editCategoryColor });
+      setEditCategoryId(null);
+      setEditCategoryName('');
+      setEditCategoryColor('#4CAF50');
+      setSuccess('Категория обновлена!');
+      loadCategories();
+    } catch {
+      setError('Ошибка при редактировании категории');
+    }
+  };
+
+  // --- Отмена редактирования категории ---
+  const handleEditCategoryCancel = () => {
+    setEditCategoryId(null);
+    setEditCategoryName('');
+    setEditCategoryColor('#4CAF50');
+  };
+
+  // --- Удалить категорию ---
+  const handleDeleteCategory = async (id) => {
+    if (!window.confirm('Удалить категорию?')) return;
+    try {
+      await deleteCategory(token, id);
+      setSuccess('Категория удалена!');
+      loadCategories();
+    } catch {
+      setError('Ошибка при удалении категории');
+    }
+  };
+
+  // --- Эффект: загрузка привычек и категорий при входе ---
   useEffect(() => {
     if (!token) {
       navigate('/login');
@@ -119,8 +196,9 @@ function Dashboard({ token, onLogout }) {
       loadHabits();
       loadCategories();
     }
-  }, [token, navigate]);
+  }, [token, navigate, loadHabits, loadCategories]);
 
+  // --- Эффект: автоочистка сообщений об ошибке/успехе ---
   useEffect(() => {
     if (error) {
       const timer = setTimeout(() => setError(''), 3000);
@@ -132,6 +210,7 @@ function Dashboard({ token, onLogout }) {
     }
   }, [error, success]);
 
+  // --- Фильтрация привычек по частоте и категории ---
   const filteredHabits = habits.filter(habit =>
     (filterFrequency === 'all' ? true : habit.frequency === filterFrequency) &&
     (filterCategory === 'all' ? true : (habit.categoryId && habit.categoryId._id === filterCategory))
@@ -233,6 +312,62 @@ function Dashboard({ token, onLogout }) {
           </div>
         ))}
       </div>
+
+      <div className="add-habit-form" style={{ marginTop: 24 }}>
+        <h3>Создать категорию</h3>
+        <div className="form-group">
+          <label>Название:</label>
+          <input
+            value={newCategoryName}
+            onChange={e => setNewCategoryName(e.target.value)}
+            placeholder="Новая категория"
+          />
+        </div>
+        <div className="form-group">
+          <label>Цвет:</label>
+          <input
+            type="color"
+            value={newCategoryColor}
+            onChange={e => setNewCategoryColor(e.target.value)}
+            style={{ width: 40, height: 32, border: 'none', background: 'none' }}
+          />
+        </div>
+        <button onClick={handleCreateCategory}>Добавить категорию</button>
+      </div>
+
+      {categories.length > 0 && (
+        <div className="add-habit-form" style={{ marginTop: 16 }}>
+          <h3>Категории</h3>
+          {categories.map(cat => (
+            <div key={cat._id} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+              {editCategoryId === cat._id ? (
+                <>
+                  <input
+                    value={editCategoryName}
+                    onChange={e => setEditCategoryName(e.target.value)}
+                    placeholder="Название"
+                  />
+                  <input
+                    type="color"
+                    value={editCategoryColor}
+                    onChange={e => setEditCategoryColor(e.target.value)}
+                    style={{ width: 32, height: 28, border: 'none', background: 'none' }}
+                  />
+                  <button onClick={() => handleEditCategorySave(cat._id)}>Сохранить</button>
+                  <button onClick={handleEditCategoryCancel}>Отмена</button>
+                </>
+              ) : (
+                <>
+                  <span style={{ background: cat.color, width: 18, height: 18, display: 'inline-block', borderRadius: 4, marginRight: 6 }}></span>
+                  <span>{cat.name}</span>
+                  <button onClick={() => startEditCategory(cat)}>Редактировать</button>
+                  <button onClick={() => handleDeleteCategory(cat._id)}>Удалить</button>
+                </>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

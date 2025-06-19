@@ -30,6 +30,10 @@ function Dashboard({ token, onLogout }) {
       setError('Пожалуйста, введите название привычки');
       return;
     }
+    if (habits.some(h => h.title.trim().toLowerCase() === title.trim().toLowerCase())) {
+      setError('Такая привычка уже существует');
+      return;
+    }
     try {
       await addHabit(token, title, frequency);
       setTitle('');
@@ -61,6 +65,10 @@ function Dashboard({ token, onLogout }) {
   const handleEditSave = async (id) => {
     if (!editTitle.trim()) {
       setError('Пожалуйста, введите название привычки');
+      return;
+    }
+    if (habits.some(h => h._id !== id && h.title.trim().toLowerCase() === editTitle.trim().toLowerCase())) {
+      setError('Такая привычка уже существует');
       return;
     }
     try {

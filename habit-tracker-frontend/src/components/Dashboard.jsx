@@ -11,6 +11,7 @@ function Dashboard({ token, onLogout }) {
   const [editId, setEditId] = useState(null);
   const [editTitle, setEditTitle] = useState('');
   const [editFrequency, setEditFrequency] = useState('daily');
+  const [filterFrequency, setFilterFrequency] = useState('all');
   const navigate = useNavigate();
 
   const loadHabits = async () => {
@@ -40,8 +41,7 @@ function Dashboard({ token, onLogout }) {
       setError('');
       setSuccess('Привычка добавлена!');
       loadHabits();
-    } catch (err) {
-      console.error('Ошибка при добавлении привычки:', err);
+    } catch {
       setError('Ошибка при добавлении привычки');
     }
   };
@@ -79,7 +79,7 @@ function Dashboard({ token, onLogout }) {
       setError('');
       setSuccess('Привычка обновлена!');
       loadHabits();
-    } catch (err) {
+    } catch {
       setError('Ошибка при редактировании привычки');
     }
   };
@@ -96,7 +96,7 @@ function Dashboard({ token, onLogout }) {
       await deleteHabit(token, id);
       setSuccess('Привычка удалена!');
       loadHabits();
-    } catch (err) {
+    } catch {
       setError('Ошибка при удалении привычки');
     }
   };
@@ -119,6 +119,10 @@ function Dashboard({ token, onLogout }) {
       return () => clearTimeout(timer);
     }
   }, [error, success]);
+
+  const filteredHabits = habits.filter(habit =>
+    filterFrequency === 'all' ? true : habit.frequency === filterFrequency
+  );
 
   return (
     <div className="app-container">
@@ -153,8 +157,17 @@ function Dashboard({ token, onLogout }) {
         <button onClick={handleAdd}>Добавить</button>
       </div>
 
+      <div className="form-group" style={{ maxWidth: 300, margin: '0 auto 1rem auto' }}>
+        <label>Показать:</label>
+        <select value={filterFrequency} onChange={e => setFilterFrequency(e.target.value)}>
+          <option value="all">Все привычки</option>
+          <option value="daily">Только ежедневные</option>
+          <option value="weekly">Только еженедельные</option>
+        </select>
+      </div>
+
       <div className="habits-list">
-        {habits.map(habit => (
+        {filteredHabits.map(habit => (
           <div key={habit._id} className="habit-item">
             <div className="habit-header">
               {editId === habit._id ? (

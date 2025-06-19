@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getHabits, addHabit, checkHabit, updateHabit, deleteHabit } from '../api';
+import { getHabits, addHabit, checkHabit, updateHabit, deleteHabit, getCategories } from '../api';
 
 function Dashboard({ token, onLogout }) {
   const [habits, setHabits] = useState([]);
@@ -12,6 +12,8 @@ function Dashboard({ token, onLogout }) {
   const [editTitle, setEditTitle] = useState('');
   const [editFrequency, setEditFrequency] = useState('daily');
   const [filterFrequency, setFilterFrequency] = useState('all');
+  const [categories, setCategories] = useState([]);
+  const [filterCategory, setFilterCategory] = useState('all');
   const navigate = useNavigate();
 
   const loadHabits = async () => {
@@ -23,6 +25,15 @@ function Dashboard({ token, onLogout }) {
         onLogout();
         navigate('/login');
       }
+    }
+  };
+
+  const loadCategories = async () => {
+    try {
+      const data = await getCategories(token);
+      setCategories(data);
+    } catch {
+      setCategories([]);
     }
   };
 
@@ -106,6 +117,7 @@ function Dashboard({ token, onLogout }) {
       navigate('/login');
     } else {
       loadHabits();
+      loadCategories();
     }
   }, [token, navigate]);
 
@@ -121,7 +133,8 @@ function Dashboard({ token, onLogout }) {
   }, [error, success]);
 
   const filteredHabits = habits.filter(habit =>
-    filterFrequency === 'all' ? true : habit.frequency === filterFrequency
+    (filterFrequency === 'all' ? true : habit.frequency === filterFrequency) &&
+    (filterCategory === 'all' ? true : (habit.categoryId && habit.categoryId._id === filterCategory))
   );
 
   return (
@@ -165,6 +178,19 @@ function Dashboard({ token, onLogout }) {
           <option value="weekly">Только еженедельные</option>
         </select>
       </div>
+
+      {categories.length > 0 && (
+        <div className="form-group" style={{ maxWidth: 300, margin: '0 auto 1rem auto' }}>
+          <label>Категория:</label>
+          <select value={filterCategory} onChange={e => setFilterCategory(e.target.value)}>
+            <option value="all">Все категории</option>
+            <option value="null">Без категории</option>
+            {categories.map(cat => (
+              <option key={cat._id} value={cat._id}>{cat.name}</option>
+            ))}
+          </select>
+        </div>
+      )}
 
       <div className="habits-list">
         {filteredHabits.map(habit => (

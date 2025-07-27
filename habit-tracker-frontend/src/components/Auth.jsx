@@ -1,3 +1,4 @@
+import React from 'react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { login, register } from '../api';
@@ -31,32 +32,32 @@ function Auth({ onLogin }) {
   return (
     <div className="auth-container">
       <div className="auth-form">
-        <h2>{isRegistering ? 'Registration' : 'Login'}</h2>
+        <h2>{isRegistering ? 'Регистрация' : 'Вход'}</h2>
         {error && <div className="error-message">{error}</div>}
         <form onSubmit={handleAuth}>
           <div className="form-group">
-            <label>Email:</label>
+            <label>Почта:</label>
             <input 
               type="email"
               value={email}
               onChange={e => setEmail(e.target.value)}
-              placeholder="Enter email"
+              placeholder="Введите почту"
               required
             />
           </div>
           <div className="form-group">
-            <label>Password:</label>
+            <label>Пароль:</label>
             <input 
               type="password"
               value={password}
               onChange={e => setPassword(e.target.value)}
-              placeholder="Enter password"
+              placeholder="Введите пароль"
               required
               minLength={6}
             />
           </div>
           <button type="submit" className="auth-button">
-            {isRegistering ? 'Register' : 'Login'}
+            {isRegistering ? 'Зарегистрироваться' : 'Войти'}
           </button>
         </form>
         <button 
@@ -66,7 +67,7 @@ function Auth({ onLogin }) {
             setError('');
           }}
         >
-          {isRegistering ? 'Already have an account?' : 'Create account'}
+          {isRegistering ? 'Уже есть аккаунт?' : 'Создать аккаунт'}
         </button>
       </div>
     </div>

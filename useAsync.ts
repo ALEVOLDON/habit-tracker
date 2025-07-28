@@ -19,8 +19,9 @@ export const useAsync = <T, E = string>() => {
       setData(responseData);
       setStatus('success');
       return responseData; // Возвращаем данные в случае успеха
-    } catch (err: any) {
-      setError(err.message || 'Что-то пошло не так');
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Что-то пошло не так';
+      setError(errorMessage as E);
       setStatus('error');
       throw err; // Пробрасываем ошибку, чтобы ее можно было поймать в компоненте
     }

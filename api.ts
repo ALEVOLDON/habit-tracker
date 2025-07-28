@@ -1,8 +1,11 @@
 import axios from 'axios';
 
+// Используем переменную окружения для базового URL.
+// Если она не задана, по умолчанию используем localhost для локальной разработки.
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 // Настраиваем базовый клиент axios
 const apiClient = axios.create({
-  baseURL: 'http://localhost:5000/api', // Укажите URL вашего бэкенда
+  baseURL: API_BASE_URL,
 });
 
 // --- Interceptor для добавления JWT токена ---
@@ -34,18 +37,24 @@ export interface UpdateHabitData {
   // ...другие поля, которые можно обновлять
 }
 
+export interface Habit {
+  _id: string;
+  name: string;
+  // ... другие поля, например, история отметок, категория и т.д.
+}
+
 export interface Category {
   _id: string;
   name: string;
 }
 
 export const api = {
-  getHabits: async () => {
+  getHabits: async (): Promise<Habit[]> => {
     const response = await apiClient.get('/habits');
     return response.data;
   },
 
-  createHabit: async (habitData: NewHabitData) => {
+  createHabit: async (habitData: NewHabitData): Promise<Habit> => {
     const response = await apiClient.post('/habits', habitData);
     return response.data;
   },
@@ -55,12 +64,12 @@ export const api = {
     return response.data;
   },
 
-  updateHabit: async (habitId: string, habitData: UpdateHabitData) => {
+  updateHabit: async (habitId: string, habitData: UpdateHabitData): Promise<Habit> => {
     const response = await apiClient.patch(`/habits/${habitId}`, habitData);
     return response.data;
   },
 
-  checkHabit: async (habitId: string) => {
+  checkHabit: async (habitId: string): Promise<Habit> => {
     const response = await apiClient.patch(`/habits/${habitId}/check`);
     return response.data;
   },

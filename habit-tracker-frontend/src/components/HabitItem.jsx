@@ -6,6 +6,10 @@ export const HabitItem = ({ habit }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [title, setTitle] = useState(habit.title);
   const [frequency, setFrequency] = useState(habit.frequency);
+  const today = new Date().toISOString().split('T')[0];
+  const doneToday = Array.isArray(habit.progress) && habit.progress.includes(today);
+  const percentage = habit.stats?.percentage;
+  const streak = habit.stats?.streak;
 
   useEffect(() => {
     setTitle(habit.title);
@@ -61,6 +65,13 @@ export const HabitItem = ({ habit }) => {
             <div className="habit-meta">
               {habit.frequency === 'weekly' ? 'Еженедельно' : 'Ежедневно'}
               {habit.categoryId && habit.categoryId.name ? ` · ${habit.categoryId.name}` : ''}
+              {typeof percentage === 'number' ? ` · Прогресс ${percentage}%` : ''}
+              {typeof streak === 'number' ? ` · Стик ${streak}` : ''}
+            </div>
+            <div className="habit-meta">
+              <span className={`badge ${doneToday ? 'badge-success' : 'badge-muted'}`}>
+                {doneToday ? 'Выполнено сегодня' : 'Ещё не выполнено сегодня'}
+              </span>
             </div>
           </>
         )}

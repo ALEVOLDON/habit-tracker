@@ -1,20 +1,12 @@
-import React, { createContext, useState, useContext, useEffect, ReactNode } from 'react';
-import { api, AuthResponse } from '../services/api';
+import React, { createContext, useState, useContext, useEffect } from 'react';
+import { api } from '../services/api';
 
-interface AuthContextType {
-  token: string | null;
-  login: (credentials: { email: string, password: string }) => Promise<AuthResponse>;
-  logout: () => void;
-  isAuthenticated: boolean;
-}
+const AuthContext = createContext();
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
-
-export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [token, setToken] = useState<string | null>(localStorage.getItem('authToken'));
+export const AuthProvider = ({ children }) => {
+  const [token, setToken] = useState(localStorage.getItem('authToken'));
 
   useEffect(() => {
-    // Синхронизация состояния с localStorage при изменениях в других вкладках
     const handleStorageChange = () => {
       setToken(localStorage.getItem('authToken'));
     };
@@ -22,7 +14,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     return () => window.removeEventListener('storage', handleStorageChange);
   }, []);
 
-  const login = async (credentials: { email: string, password: string }) => {
+  const login = async (credentials) => {
     const response = await api.login(credentials);
     localStorage.setItem('authToken', response.token);
     setToken(response.token);

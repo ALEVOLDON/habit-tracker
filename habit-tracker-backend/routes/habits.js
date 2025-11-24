@@ -2,7 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const Habit = require('../models/Habit');
 const Category = require('../models/Category');
-const auth = require('../middleware/authMiddleware');
+const auth = require('../middleware/auth');
 const { body, validationResult } = require('express-validator');
 
 const router = express.Router();

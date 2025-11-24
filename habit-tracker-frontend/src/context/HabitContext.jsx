@@ -1,51 +1,36 @@
-import React, { createContext, useContext, useState, useCallback, ReactNode } from 'react';
-import { api, NewHabitData, UpdateHabitData, Habit } from '../api';
-import { useAsync } from '../useAsync';
+﻿import React, { createContext, useContext, useState, useCallback } from 'react';
+import { api } from '../services/api';
+import { useAsync } from '../hooks/useAsync';
 import { notificationService } from '../notificationService';
 
-interface HabitContextType {
-  habits: Habit[];
-  fetchHabits: () => Promise<void>;
-  addHabit: (habitData: NewHabitData) => Promise<Habit | undefined>;
-  deleteHabit: (habitId: string) => Promise<void>;
-  updateHabit: (habitId: string, habitData: UpdateHabitData) => Promise<void>;
-  checkHabit: (habitId: string) => Promise<void>;
-  isLoading: boolean;
-  error: string | null;
-}
-
-const HabitContext = createContext<HabitContextType | undefined>(undefined);
+const HabitContext = createContext();
 
 export const useHabits = () => {
   const context = useContext(HabitContext);
   if (context === undefined) {
-    throw new Error('useHabits должен использоваться внутри HabitProvider');
+    throw new Error('useHabits must be used within a HabitProvider');
   }
   return context;
 };
 
-interface HabitProviderProps {
-  children: ReactNode;
-}
-
-export const HabitProvider = ({ children }: HabitProviderProps) => {
-  const [habits, setHabits] = useState<Habit[]>([]);
-  // Используем useAsync для управления состоянием асинхронных операций
-  const { execute, isLoading, error } = useAsync<any>();
+export const HabitProvider = ({ children }) => {
+  const [habits, setHabits] = useState([]);
+  const { execute, isLoading, error } = useAsync();
 
   const fetchHabits = useCallback(async () => {
     try {
       const fetchedHabits = await execute(api.getHabits);
-      if (fetchedHabits) {
+      if (Array.isArray(fetchedHabits)) {
         setHabits(fetchedHabits);
+      } else {
+        setHabits([]);
       }
     } catch (err) {
-      // Ошибки уже обрабатываются в useAsync, но можно добавить уведомление
-      notificationService.error('Не удалось загрузить привычки.');
+      notificationService.error('Не удалось загрузить список привычек.');
     }
   }, [execute]);
 
-  const addHabit = useCallback(async (habitData: NewHabitData) => {
+  const addHabit = useCallback(async (habitData) => {
     try {
       const newHabit = await execute(() => api.createHabit(habitData));
       if (newHabit) {
@@ -58,7 +43,7 @@ export const HabitProvider = ({ children }: HabitProviderProps) => {
     }
   }, [execute]);
 
-  const deleteHabit = useCallback(async (habitId: string) => {
+  const deleteHabit = useCallback(async (habitId) => {
     try {
       await execute(() => api.deleteHabit(habitId));
       setHabits((prevHabits) => prevHabits.filter((habit) => habit._id !== habitId));
@@ -68,7 +53,7 @@ export const HabitProvider = ({ children }: HabitProviderProps) => {
     }
   }, [execute]);
 
-  const updateHabit = useCallback(async (habitId: string, habitData: UpdateHabitData) => {
+  const updateHabit = useCallback(async (habitId, habitData) => {
     try {
       const updatedHabit = await execute(() => api.updateHabit(habitId, habitData));
       if (updatedHabit) {
@@ -82,14 +67,14 @@ export const HabitProvider = ({ children }: HabitProviderProps) => {
     }
   }, [execute]);
 
-  const checkHabit = useCallback(async (habitId: string) => {
+  const checkHabit = useCallback(async (habitId) => {
     try {
       const updatedHabit = await execute(() => api.checkHabit(habitId));
       if (updatedHabit) {
-         setHabits((prevHabits) =>
+        setHabits((prevHabits) =>
           prevHabits.map((habit) => (habit._id === habitId ? updatedHabit : habit))
         );
-        notificationService.success('Отлично! Так держать!');
+        notificationService.success('Готово! Так держать!');
       }
     } catch (err) {
       notificationService.error('Не удалось отметить привычку.');

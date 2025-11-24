@@ -8,7 +8,6 @@ const rateLimit = require('express-rate-limit');
 const authRoutes = require('./routes/auth');
 const habitRoutes = require('./routes/habits');
 const categoryRoutes = require('./routes/categories');
-const authenticateToken = require('./middleware/auth');
 
 dotenv.config();
 
@@ -40,8 +39,8 @@ const PORT = process.env.PORT || 5000;
 
 // Роуты
 app.use('/api/auth', authRoutes);
-app.use('/api/habits', authenticateToken, habitRoutes);
-app.use('/api/categories', authenticateToken, categoryRoutes);
+app.use('/api/habits', habitRoutes);
+app.use('/api/categories', categoryRoutes);
 
 app.get('/', (req, res) => {
   res.send('API is working!');

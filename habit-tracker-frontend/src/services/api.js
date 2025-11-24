@@ -1,7 +1,6 @@
 ﻿import axios from 'axios';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
-const AUTH_PREFIX = 'Bearer ';
 
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
@@ -11,7 +10,7 @@ apiClient.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('authToken');
     if (token && token !== 'undefined') {
-      config.headers.Authorization = ${AUTH_PREFIX};
+      config.headers.Authorization = Bearer ;
     } else {
       localStorage.removeItem('authToken');
     }

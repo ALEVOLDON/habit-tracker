@@ -1,4 +1,4 @@
-:root {
+﻿:root {
   --bg: #0b1021;
   --panel: #121733;
   --accent: #6ee7ff;
@@ -13,18 +13,19 @@
 
 body {
   margin: 0;
-  font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  font-family: "Inter", "Segoe UI", system-ui, sans-serif;
   background: radial-gradient(120% 120% at 10% 10%, #1b2b5a 0%, #0b1021 50%, #0b1021 100%);
   color: var(--text);
   min-height: 100vh;
 }
 
-a { color: var(--accent); }
+a { text-decoration: none; }
 
 #root {
   max-width: 1100px;
   margin: 0 auto;
   padding: 32px 20px 48px;
+  min-height: 100vh;
 }
 
 .page {
@@ -123,6 +124,9 @@ button.danger {
 
 .habit-actions button { width: 36px; height: 36px; display: grid; place-items: center; }
 
+.input-inline { margin-right: 8px; }
+.select-inline { margin-right: 8px; }
+
 .muted { color: var(--muted); }
 
 .badge {
@@ -178,3 +182,24 @@ button.danger {
   #root { padding: 16px 12px 32px; }
   .page-header { flex-direction: column; align-items: flex-start; }
 }
+
+/* Landing page */
+.landing { display: flex; flex-direction: column; gap: 32px; }
+.landing-header { display: flex; justify-content: space-between; align-items: center; }
+.brand { font-weight: 700; font-size: 18px; letter-spacing: 0.5px; }
+.cta-row { display: flex; gap: 10px; }
+.hero { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; align-items: center; }
+.hero-text h1 { margin: 8px 0 12px; font-size: 32px; }
+.hero-text .label { text-transform: uppercase; letter-spacing: 1px; color: var(--accent); font-size: 12px; }
+.hero-card { background: linear-gradient(135deg, rgba(110, 231, 255, 0.08), rgba(34, 211, 238, 0.05)); border: 1px solid var(--border); border-radius: 16px; padding: 16px; min-height: 260px; }
+.hero-screenshot { display: flex; flex-direction: column; gap: 10px; }
+.skeleton-title { height: 18px; width: 70%; background: #11172e; border-radius: 6px; }
+.skeleton-line { height: 12px; width: 90%; background: #11172e; border-radius: 6px; }
+.skeleton-line.short { width: 60%; }
+.skeleton-pill { height: 16px; width: 40%; background: #11172e; border-radius: 999px; }
+.skeleton-button { height: 36px; width: 50%; background: #11172e; border-radius: 10px; }
+.features { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
+.feature-card { background: #0f152b; border: 1px solid var(--border); border-radius: 12px; padding: 12px; display: flex; gap: 10px; align-items: center; }
+.feature-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--accent); }
+.btn { padding: 10px 14px; border-radius: 10px; font-weight: 600; border: 1px solid var(--border); background: var(--accent); color: #0b1021; }
+.btn.ghost { background: transparent; color: var(--text); }

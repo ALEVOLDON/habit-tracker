@@ -7,8 +7,13 @@ Full-stack трекер привычек: Node.js + Express + MongoDB на бэ�
 ## Возможности
 - Регистрация/логин (JWT)
 - CRUD привычек с частотой (daily/weekly) и категориями
-- Отметка выполнения, фильтры и статистика
+- Отметка выполнения, фильтры и базовая статистика
 - CRUD категорий
+
+## Навигация
+- `/` — публичный лендинг
+- `/login`, `/register` — формы авторизации
+- `/app` — дашборд (защищённая зона)
 
 ## Быстрый старт (локально)
 1) Клонировать:
@@ -36,7 +41,7 @@ npm run dev
 ### Бэкенд (`habit-tracker-backend/.env`)
 ```
 PORT=5000
-MONGO_URI=mongodb://localhost:27017/habittracker
+MONGO_URI=mongodb://localhost:27017/habittracker   # или ваш Atlas URI
 JWT_SECRET=your_jwt_secret
 FRONTEND_URL=http://localhost:5173   # прод: https://your-frontend.com
 ```
@@ -76,10 +81,9 @@ habit-tracker/
 └─ habit-tracker-frontend/  # React + Vite SPA
 ```
 
-## Деплой (Netlify + внешний бэкенд)
-- Netlify: base `habit-tracker-frontend`, build `npm run build`, publish `habit-tracker-frontend/dist`.
-- Env (Netlify): VITE_API_URL=https://your-backend.com/api
-- Бэкенд .env: FRONTEND_URL=https://your-frontend.com (для CORS)
+## Деплой (Netlify + Render)
+- Frontend: Netlify (base `habit-tracker-frontend`, build `npm run build`, publish `habit-tracker-frontend/dist`). Env: `VITE_API_URL=https://<render-app>.onrender.com/api`.
+- Backend: Render (Node service). Env: `MONGO_URI=<Atlas URI>`, `JWT_SECRET=<секрет>`, `FRONTEND_URL=https://<netlify-site>.netlify.app`. PORT не задаём — Render прокидывает сам.
 
 ## License
 MIT

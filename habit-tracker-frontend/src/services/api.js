@@ -6,23 +6,26 @@ const apiClient = axios.create({
   baseURL: API_BASE_URL,
 });
 
+// Добавляем токен, если он есть и валиден
 apiClient.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('authToken');
-    if (token) {
+    if (token && token !== 'undefined') {
       config.headers.Authorization = Bearer ;
+    } else {
+      localStorage.removeItem('authToken');
     }
     return config;
   },
   (error) => Promise.reject(error)
 );
 
+// При 401 чистим токен и уводим на логин
 apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error?.response?.status === 401) {
       localStorage.removeItem('authToken');
-      // Перенаправляем на логин, если токен истёк или невалиден
       if (window.location.pathname !== '/login') {
         window.location.href = '/login';
       }

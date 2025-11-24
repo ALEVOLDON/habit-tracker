@@ -1,4 +1,6 @@
-﻿# Habit Tracker
+﻿![Скрин интерфейса](docs/screenshot.svg)
+
+# Habit Tracker
 
 Full-stack трекер привычек: Node.js + Express + MongoDB на бэкенде и React + Vite на фронтенде.
 

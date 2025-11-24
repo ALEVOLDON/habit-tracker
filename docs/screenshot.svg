@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="900" viewBox="0 0 1200 900" fill="none">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#11182e" />
+      <stop offset="100%" stop-color="#0c1124" />
+    </linearGradient>
+    <style>
+      .card{fill:#111a37;stroke:#1f2c4f;stroke-width:1;rx:16;ry:16;}
+      .title{fill:#e5e7eb;font-family:'Segoe UI',sans-serif;font-weight:700;}
+      .muted{fill:#9ca3af;font-family:'Segoe UI',sans-serif;font-size:18px;}
+      .pill{fill:#0f172a;stroke:#1f2c4f;stroke-width:1;rx:10;ry:10;}
+      .pill-active{fill:#6ee7ff;}
+      .pill-text{fill:#e5e7eb;font-family:'Segoe UI',sans-serif;font-size:16px;}
+      .btn{fill:#52d2ff;rx:10;ry:10;}
+      .btn-text{fill:#0c1124;font-family:'Segoe UI',sans-serif;font-weight:600;font-size:18px;}
+      .input{fill:#0f172a;stroke:#1f2c4f;stroke-width:1;rx:10;ry:10;}
+      .input-text{fill:#e5e7eb;font-family:'Segoe UI',sans-serif;font-size:16px;}
+    </style>
+  </defs>
+  <rect width="1200" height="900" fill="url(#bg)" />
+  <text x="40" y="70" class="title" font-size="36">Трекер привычек</text>
+  <text x="40" y="105" class="muted">Добавляйте привычки, отмечайте выполнение и управляйте категориями.</text>
+  <rect x="40" y="140" width="1120" height="160" class="card" />
+  <text x="70" y="190" class="title" font-size="24">Добавить привычку</text>
+  <rect x="70" y="210" width="350" height="44" class="input" />
+  <text x="82" y="238" class="input-text">Например, пить 15 стаканов воды</text>
+  <rect x="440" y="210" width="180" height="44" class="input" />
+  <text x="470" y="238" class="input-text">Ежедневно</text>
+  <rect x="640" y="210" width="200" height="44" class="input" />
+  <text x="665" y="238" class="input-text">Без категории</text>
+  <rect x="860" y="210" width="260" height="44" class="btn" />
+  <text x="960" y="240" class="btn-text">Добавить</text>
+
+  <g transform="translate(40 330)">
+    <rect x="0" y="0" width="70" height="36" class="pill pill-active" />
+    <text x="20" y="24" class="pill-text">Все</text>
+    <rect x="90" y="0" width="140" height="36" class="pill" />
+    <text x="110" y="24" class="pill-text">Без категории</text>
+  </g>
+  <text x="40" y="390" class="muted">У вас пока нет привычек. Добавьте первую!</text>
+
+  <rect x="40" y="430" width="1120" height="220" class="card" />
+  <text x="70" y="470" class="title" font-size="22">Категории</text>
+  <rect x="70" y="490" width="700" height="44" class="input" />
+  <text x="82" y="518" class="input-text">Название категории</text>
+  <rect x="790" y="490" width="300" height="44" class="btn" />
+  <text x="910" y="520" class="btn-text">Создать</text>
+
+  <text x="40" y="680" class="muted" font-size="14">Скрин иллюстрирует начальный экран (пустые списки).</text>
+</svg>

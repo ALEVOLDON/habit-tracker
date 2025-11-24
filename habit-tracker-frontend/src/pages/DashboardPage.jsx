@@ -1,4 +1,5 @@
-﻿import { useAuth } from '../context/AuthContext';
+﻿import React, { useEffect, useState, useCallback } from 'react';
+import { useAuth } from '../context/AuthContext';
 import { useHabits } from '../context/HabitContext';
 import { api } from '../services/api';
 import { AddHabitForm } from '../components/AddHabitForm';
@@ -10,11 +11,11 @@ import { Link } from 'react-router-dom';
 const DashboardPage = () => {
   const { habits, fetchHabits, isLoading, error } = useHabits();
   const { logout } = useAuth();
-  const [categories, setCategories] = React.useState([]);
-  const [isLoadingCategories, setIsLoadingCategories] = React.useState(true);
-  const [selectedCategory, setSelectedCategory] = React.useState(null);
+  const [categories, setCategories] = useState([]);
+  const [isLoadingCategories, setIsLoadingCategories] = useState(true);
+  const [selectedCategory, setSelectedCategory] = useState(null);
 
-  const loadCategories = React.useCallback(async () => {
+  const loadCategories = useCallback(async () => {
     setIsLoadingCategories(true);
     try {
       const data = await api.getCategories();
@@ -27,7 +28,7 @@ const DashboardPage = () => {
     }
   }, []);
 
-  React.useEffect(() => {
+  useEffect(() => {
     fetchHabits();
     loadCategories();
   }, [fetchHabits, loadCategories]);

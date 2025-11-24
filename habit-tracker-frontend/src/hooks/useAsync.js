@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+﻿import { useState, useCallback } from 'react';
 
 export const useAsync = () => {
   const [status, setStatus] = useState('idle');
@@ -15,7 +15,8 @@ export const useAsync = () => {
       setStatus('success');
       return responseData;
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : '���-�� ����� �� ���';
+      const errorMessage =
+        err?.response?.data?.message || err?.message || 'Что-то пошло не так. Попробуйте ещё раз.';
       setError(errorMessage);
       setStatus('error');
       throw err;

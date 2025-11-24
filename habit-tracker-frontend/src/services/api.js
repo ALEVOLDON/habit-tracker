@@ -1,4 +1,4 @@
-import axios from 'axios';
+﻿import axios from 'axios';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
@@ -10,17 +10,30 @@ apiClient.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('authToken');
     if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+      config.headers.Authorization = Bearer ;
     }
     return config;
   },
   (error) => Promise.reject(error)
 );
 
+apiClient.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error?.response?.status === 401) {
+      localStorage.removeItem('authToken');
+      // Перенаправляем на логин, если токен истёк или невалиден
+      if (window.location.pathname !== '/login') {
+        window.location.href = '/login';
+      }
+    }
+    return Promise.reject(error);
+  }
+);
+
 export const api = {
   async getHabits() {
     const response = await apiClient.get('/habits');
-    // backend отвечает объектом { habits, pagination }, нам нужен массив
     return Array.isArray(response.data) ? response.data : response.data.habits || [];
   },
 
@@ -30,17 +43,17 @@ export const api = {
   },
 
   async deleteHabit(habitId) {
-    const response = await apiClient.delete(`/habits/${habitId}`);
+    const response = await apiClient.delete(/habits/);
     return response.data;
   },
 
   async updateHabit(habitId, habitData) {
-    const response = await apiClient.patch(`/habits/${habitId}`, habitData);
+    const response = await apiClient.patch(/habits/, habitData);
     return response.data;
   },
 
   async checkHabit(habitId) {
-    const response = await apiClient.patch(`/habits/${habitId}/check`);
+    const response = await apiClient.patch(/habits//check);
     return response.data;
   },
 
@@ -55,12 +68,12 @@ export const api = {
   },
 
   async updateCategory(categoryId, categoryData) {
-    const response = await apiClient.patch(`/categories/${categoryId}`, categoryData);
+    const response = await apiClient.patch(/categories/, categoryData);
     return response.data;
   },
 
   async deleteCategory(categoryId) {
-    await apiClient.delete(`/categories/${categoryId}`);
+    await apiClient.delete(/categories/);
   },
 
   async login(credentials) {

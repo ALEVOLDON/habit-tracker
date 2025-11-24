@@ -10,7 +10,7 @@ apiClient.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('authToken');
     if (token && token !== 'undefined') {
-      config.headers.Authorization = Bearer ;
+      config.headers.Authorization = `Bearer ${token}`;
     } else {
       localStorage.removeItem('authToken');
     }
@@ -44,17 +44,17 @@ export const api = {
   },
 
   async deleteHabit(habitId) {
-    const response = await apiClient.delete(/habits/);
+    const response = await apiClient.delete(`/habits/${habitId}`);
     return response.data;
   },
 
   async updateHabit(habitId, habitData) {
-    const response = await apiClient.patch(/habits/, habitData);
+    const response = await apiClient.patch(`/habits/${habitId}`, habitData);
     return response.data;
   },
 
   async checkHabit(habitId) {
-    const response = await apiClient.patch(/habits//check);
+    const response = await apiClient.patch(`/habits/${habitId}/check`);
     return response.data;
   },
 
@@ -69,12 +69,12 @@ export const api = {
   },
 
   async updateCategory(categoryId, categoryData) {
-    const response = await apiClient.patch(/categories/, categoryData);
+    const response = await apiClient.patch(`/categories/${categoryId}`, categoryData);
     return response.data;
   },
 
   async deleteCategory(categoryId) {
-    await apiClient.delete(/categories/);
+    await apiClient.delete(`/categories/${categoryId}`);
   },
 
   async login(credentials) {

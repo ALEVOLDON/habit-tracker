@@ -1,119 +1,83 @@
-# рџ§  Habit Tracker
+# Habit Tracker
 
-РџРѕР»РЅРѕС†РµРЅРЅРѕРµ РїСЂРёР»РѕР¶РµРЅРёРµ РґР»СЏ РѕС‚СЃР»РµР¶РёРІР°РЅРёСЏ РїСЂРёРІС‹С‡РµРє РЅР° **Node.js**, **Express**, **MongoDB** Рё **React + Vite**.
+Full-stack трекер привычек: Node.js + Express + MongoDB на бэкенде и React + Vite на фронтенде.
 
-РЎР»РµРґРё Р·Р° СЃРІРѕРёРјРё РїСЂРёРІС‹С‡РєР°РјРё, РѕС‚РјРµС‡Р°Р№ РІС‹РїРѕР»РЅРµРЅРёРµ, РёСЃРїРѕР»СЊР·СѓР№ РєР°С‚РµРіРѕСЂРёРё Рё С„РёР»СЊС‚СЂС‹. РРЅС‚РµСЂС„РµР№СЃ РїРѕР»РЅРѕСЃС‚СЊСЋ РЅР° СЂСѓСЃСЃРєРѕРј, Р°РґР°РїС‚РёРІРµРЅ РґР»СЏ РјРѕР±РёР»СЊРЅС‹С….
+## Возможности
+- Регистрация/логин (JWT)
+- CRUD привычек с частотой (daily/weekly) и категориями
+- Отметка выполнения, фильтры и статистика
+- CRUD категорий
 
----
-
-## рџљЂ Р’РѕР·РјРѕР¶РЅРѕСЃС‚Рё
-
-- рџ”ђ РђСѓС‚РµРЅС‚РёС„РёРєР°С†РёСЏ РїРѕР»СЊР·РѕРІР°С‚РµР»РµР№ (JWT)
-- вћ• РЎРѕР·РґР°РЅРёРµ, СЂРµРґР°РєС‚РёСЂРѕРІР°РЅРёРµ Рё СѓРґР°Р»РµРЅРёРµ РїСЂРёРІС‹С‡РµРє
-- вњ… РћС‚РјРµС‚РєР° РІС‹РїРѕР»РЅРµРЅРёСЏ РїСЂРёРІС‹С‡РєРё
-- рџ—‚пёЏ РљР°С‚РµРіРѕСЂРёРё РїСЂРёРІС‹С‡РµРє (СЃРѕР·РґР°РЅРёРµ, СЂРµРґР°РєС‚РёСЂРѕРІР°РЅРёРµ, СѓРґР°Р»РµРЅРёРµ)
-- рџ”Ћ Р¤РёР»СЊС‚СЂР°С†РёСЏ РїРѕ С‡Р°СЃС‚РѕС‚Рµ Рё РєР°С‚РµРіРѕСЂРёРё
-- рџ–ЉпёЏ Р РµРґР°РєС‚РёСЂРѕРІР°РЅРёРµ РїСЂРёРІС‹С‡РµРє Рё РєР°С‚РµРіРѕСЂРёР№ РїСЂСЏРјРѕ РІ РёРЅС‚РµСЂС„РµР№СЃРµ
-- рџ“± РњРѕР±РёР»СЊРЅР°СЏ Р°РґР°РїС‚РёРІРЅРѕСЃС‚СЊ
-- рџ‡·рџ‡є РџРѕР»РЅР°СЏ СЂСѓСЃРёС„РёРєР°С†РёСЏ РёРЅС‚РµСЂС„РµР№СЃР°
-- рџЋЁ Р§РёСЃС‚С‹Р№ Рё СЃРѕРІСЂРµРјРµРЅРЅС‹Р№ UI РЅР° React + Vite
-- рџ§№ ESLint Рё Prettier РґР»СЏ С‡РёСЃС‚РѕС‚С‹ РєРѕРґР°
-
----
-
-## вљЎ Р‘С‹СЃС‚СЂС‹Р№ СЃС‚Р°СЂС‚
-
-1. **РљР»РѕРЅРёСЂСѓР№ СЂРµРїРѕР·РёС‚РѕСЂРёР№:**
-   ```bash
-   git clone https://github.com/ALEVOLDON/habit-tracker.git
-   cd habit-tracker
-   ```
-2. **РЈСЃС‚Р°РЅРѕРІРё Рё Р·Р°РїСѓСЃС‚Рё Р±СЌРєРµРЅРґ:**
-   ```bash
-   cd habit-tracker-backend
-   npm install
-   cp .env.example .env # РЅР°СЃС‚СЂРѕР№ .env СЃ MONGO_URI Рё JWT_SECRET
-   npm run dev
-   ```
-3. **РЈСЃС‚Р°РЅРѕРІРё Рё Р·Р°РїСѓСЃС‚Рё С„СЂРѕРЅС‚РµРЅРґ:**
-   ```bash
-   cd ../habit-tracker-frontend
-   npm install
-   npm run dev
-   ```
-4. **РћС‚РєСЂРѕР№ [http://localhost:5173](http://localhost:5173) РІ Р±СЂР°СѓР·РµСЂРµ**
-
----
-
-## рџ“Ѓ РЎС‚СЂСѓРєС‚СѓСЂР° РїСЂРѕРµРєС‚Р°
-
+## Быстрый старт (локально)
+1) Клонировать:
+```bash
+git clone https://github.com/ALEVOLDON/habit-tracker.git
+cd habit-tracker
 ```
-habit-tracker/
-в”њв”Ђв”Ђ habit-tracker-backend/   # Express + MongoDB API
-в”њв”Ђв”Ђ habit-tracker-frontend/  # React + Vite frontend
+2) Бэкенд:
+```bash
+cd habit-tracker-backend
+npm install
+cp .env.example .env   # заполните MONGO_URI, JWT_SECRET, при необходимости FRONTEND_URL
+npm run dev
 ```
+3) Фронтенд (новое окно):
+```bash
+cd habit-tracker-frontend
+npm install
+cp .env.example .env   # для локалки оставьте VITE_API_URL=http://localhost:5000/api
+npm run dev
+```
+4) Открыть http://localhost:5173
 
----
-
-## рџ—‚пёЏ Р Р°Р±РѕС‚Р° СЃ РєР°С‚РµРіРѕСЂРёСЏРјРё
-- РЎРѕР·РґР°РІР°Р№, СЂРµРґР°РєС‚РёСЂСѓР№ Рё СѓРґР°Р»СЏР№ РєР°С‚РµРіРѕСЂРёРё РІ СЂР°Р·РґРµР»Рµ "РљР°С‚РµРіРѕСЂРёРё" РЅР° РґР°С€Р±РѕСЂРґРµ.
-- РџСЂРёРІСЏР·С‹РІР°Р№ РїСЂРёРІС‹С‡РєРё Рє РєР°С‚РµРіРѕСЂРёСЏРј РґР»СЏ СѓРґРѕР±РЅРѕР№ С„РёР»СЊС‚СЂР°С†РёРё.
-- РњРѕР¶РЅРѕ С„РёР»СЊС‚СЂРѕРІР°С‚СЊ РїСЂРёРІС‹С‡РєРё РїРѕ РєР°С‚РµРіРѕСЂРёРё Рё С‡Р°СЃС‚РѕС‚Рµ РѕРґРЅРѕРІСЂРµРјРµРЅРЅРѕ.
-
----
-
-## рџ§№ Р›РёРЅС‚РµСЂ Рё Prettier
-- Р”Р»СЏ С‡РёСЃС‚РѕС‚С‹ РєРѕРґР° РёСЃРїРѕР»СЊР·СѓР№:
-  ```bash
-  npm run lint    # РџСЂРѕРІРµСЂРєР° РєРѕРґР° Р»РёРЅС‚РµСЂРѕРј
-  npm run format  # Р¤РѕСЂРјР°С‚РёСЂРѕРІР°РЅРёРµ Prettier
-  ```
-- РљРѕРЅС„РёРіРё СѓР¶Рµ РЅР°СЃС‚СЂРѕРµРЅС‹ РІ habit-tracker-frontend.
-
----
-
-## рџ”§ .env РїСЂРёРјРµСЂ (backend)
+## Переменные окружения
+### Бэкенд (`habit-tracker-backend/.env`)
 ```
 PORT=5000
-MONGO_URI=mongodb://localhost:27017/habit-tracker
+MONGO_URI=mongodb://localhost:27017/habittracker
 JWT_SECRET=your_jwt_secret
+FRONTEND_URL=http://localhost:5173   # прод: https://your-frontend.com
+```
+### Фронтенд (`habit-tracker-frontend/.env`)
+```
+VITE_API_URL=http://localhost:5000/api   # прод: https://your-backend.com/api
 ```
 
----
+## Скрипты
+### Бэкенд
+- npm run dev — dev-сервер (nodemon)
+- npm test   — Jest + mongodb-memory-server
 
-## рџ“¬ API Endpoints (localhost:5000)
-| Method | Endpoint                  | Description          |
-|--------|---------------------------|----------------------|
-| POST   | `/api/auth/register`      | Register new user    |
-| POST   | `/api/auth/login`         | Login user (returns JWT) |
-| GET    | `/api/habits`             | Get all habits       |
-| POST   | `/api/habits`             | Create new habit     |
-| PATCH  | `/api/habits/:id/check`   | Mark as done         |
-| PATCH  | `/api/habits/:id`         | Edit habit           |
-| DELETE | `/api/habits/:id`         | Delete habit         |
-| GET    | `/api/categories`         | Get all categories   |
-| POST   | `/api/categories`         | Create category      |
-| PATCH  | `/api/categories/:id`     | Edit category        |
-| DELETE | `/api/categories/:id`     | Delete category      |
+### Фронтенд
+- npm run dev   — Vite dev server
+- npm run build — прод сборка
 
----
+## API (localhost:5000)
+| Method | Endpoint                | Description |
+| ------ | ----------------------- | ----------- |
+| POST   | /api/auth/register      | Регистрация |
+| POST   | /api/auth/login         | Логин (JWT) |
+| GET    | /api/habits             | Список привычек |
+| POST   | /api/habits             | Создать привычку |
+| PATCH  | /api/habits/:id         | Обновить привычку |
+| PATCH  | /api/habits/:id/check   | Отметить выполнение |
+| DELETE | /api/habits/:id         | Удалить привычку |
+| GET    | /api/categories         | Список категорий |
+| POST   | /api/categories         | Создать категорию |
+| PATCH  | /api/categories/:id     | Обновить категорию |
+| DELETE | /api/categories/:id     | Удалить категорию |
 
-## рџ’» Р¤СЂРѕРЅС‚РµРЅРґ
+## Структура
+```
+habit-tracker/
++- habit-tracker-backend/   # Express + MongoDB API
+L- habit-tracker-frontend/  # React + Vite SPA
+```
 
-Р’СЃСЏ Р»РѕРіРёРєР° Рё UI вЂ” РІ `habit-tracker-frontend`.
-- React + Vite
-- РџРѕР»РЅР°СЏ РїРѕРґРґРµСЂР¶РєР° СЂСѓСЃСЃРєРѕРіРѕ СЏР·С‹РєР°
-- РњРѕР±РёР»СЊРЅР°СЏ Р°РґР°РїС‚РёРІРЅРѕСЃС‚СЊ
+## Деплой (Netlify + внешний бэкенд)
+- Netlify: base `habit-tracker-frontend`, build `npm run build`, publish `habit-tracker-frontend/dist`.
+- Env (Netlify): VITE_API_URL=https://your-backend.com/api
+- Бэкенд .env: FRONTEND_URL=https://your-frontend.com (для CORS)
 
----
-
-## рџ›ЎпёЏ РўРµС…РЅРѕР»РѕРіРёРё
-- **Backend**: Node.js, Express, MongoDB, Mongoose, JWT
-- **Frontend**: React, Vite, CSS
-- **РРЅСЃС‚СЂСѓРјРµРЅС‚С‹**: Nodemon, ESLint, Prettier, Git
-
----
-
-## рџ“љ License
-
-MIT вЂ” feel free to use and modify.
+## License
+MIT

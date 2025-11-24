@@ -13,7 +13,7 @@ export const HabitItem = ({ habit }) => {
   }, [habit.title, habit.frequency]);
 
   const handleDelete = () => {
-    if (window.confirm(Вы уверены, что хотите удалить привычку ""?)) {
+    if (window.confirm(`Вы уверены, что хотите удалить привычку "${habit.title}"?`)) {
       deleteHabit(habit._id);
     }
   };
@@ -60,7 +60,7 @@ export const HabitItem = ({ habit }) => {
             <div className="habit-title">{habit.title}</div>
             <div className="habit-meta">
               {habit.frequency === 'weekly' ? 'Еженедельно' : 'Ежедневно'}
-              {habit.categoryId && habit.categoryId.name ?  ·  : ''}
+              {habit.categoryId && habit.categoryId.name ? ` · ${habit.categoryId.name}` : ''}
             </div>
           </>
         )}
